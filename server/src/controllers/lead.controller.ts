@@ -52,24 +52,21 @@ const leadService = new LeadService();
 export class LeadController {
 
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      // parse() throws ZodError if validation fails
-      // ZodError is caught by errorHandler middleware automatically
-      const validated = createLeadSchema.parse(req.body);
-      const lead = await leadService.createAndAnalyzeLead(validated);
+  try {
+    const validated = createLeadSchema.parse(req.body);
+    const lead = await leadService.createAndAnalyzeLead(validated);
 
-      res.status(201).json({
-        success: true,
-        data: lead,
-        message:
-          lead.status === 'analyzed'
-            ? 'Lead created and analyzed successfully'
-            : 'Lead created but AI analysis failed. The lead is saved.',
-      });
-    } catch (error) {
-      next(error);
-    }
+    // Status 202 Accepted = "request received, processing not yet complete"
+    // This is the correct HTTP status for async work, not 201 Created alone
+    res.status(202).json({
+      success: true,
+      data: lead,
+      message: 'Lead received and queued for AI analysis. Poll GET /api/leads/:id for results.',
+    });
+  } catch (error) {
+    next(error);
   }
+}
 
   async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

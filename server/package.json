@@ -4,11 +4,13 @@
   "description": "AI-powered lead intelligence backend",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "type-check": "tsc --noEmit"
-  },
+  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+  "worker": "ts-node-dev --respawn --transpile-only src/worker.ts",
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "start:worker": "node dist/worker.js",
+  "type-check": "tsc --noEmit"
+},
   "keywords": [
     "ai",
     "lead-scoring",
@@ -18,15 +20,18 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^1.18.0",
+    "bull": "^4.16.5",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "helmet": "^8.2.0",
+    "ioredis": "^5.11.1",
     "mongoose": "^9.7.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/bull": "^3.15.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.3",

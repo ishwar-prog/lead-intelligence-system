@@ -1,76 +1,45 @@
 import { Lead, ILead } from '../../models/lead.model';
-import { GeminiProvider } from '../ai/providers/gemini.provider';
 import { LeadAnalysisInput } from '../../types/ai.types';
+import { enqueueLeadAnalysis } from '../../queues/leadAnalysis.queue';
 
 /**
- * LeadService — Business logic layer
+ * LeadService — UPDATED for Phase 2
  *
- * Professor Note — What this service does NOT do:
- * - It does not know about HTTP (no req, no res, no status codes)
- * - It does not call Gemini directly (only through the AIProvider interface)
- * - It does not format API responses
+ * Professor Note on what changed and why:
  *
- * What it DOES do:
- * - Orchestrates the lead creation and analysis flow
- * - Handles database operations
- * - Manages state transitions (pending → analyzed → failed)
+ * BEFORE (Phase 1): This service called GeminiProvider directly and
+ * waited for the result before returning. The HTTP request stayed open
+ * for the entire AI call duration.
  *
- * This separation means:
- * - You can call this service from a REST controller today
- * - And from a background job queue tomorrow
- * - Without changing a single line in this file
+ * NOW (Phase 2): This service saves the lead, adds a job to the queue,
+ * and returns IMMEDIATELY. The actual AI call happens later, in the
+ * worker process, completely decoupled from this HTTP request.
+ *
+ * Notice: GeminiProvider is no longer imported here at all. This service
+ * doesn't know or care which AI provider does the work, or even that
+ * it's a 'queue' specifically. It just knows "enqueue analysis work."
+ * That's good separation of concerns holding up across a real
+ * architectural change.
  */
-
-// Instantiate the AI provider once — not on every request
-// This avoids creating a new object for every API call
-const aiProvider = new GeminiProvider();
-
 export class LeadService {
 
-  /**
-   * createAndAnalyzeLead
-   *
-   * Flow:
-   * 1. Save lead to DB with status 'pending' — we have the data even if AI fails
-   * 2. Call AI provider
-   * 3. Update lead with analysis and status 'analyzed'
-   * 4. If AI fails, update status to 'failed' with reason
-   * 5. Return the lead regardless
-   *
-   * Why save before calling AI?
-   * If the AI call hangs for 25 seconds and the client disconnects,
-   * we still have the lead in the database.
-   * The lead is never lost because of an AI timeout.
-   */
   async createAndAnalyzeLead(input: LeadAnalysisInput): Promise<ILead> {
-    // Step 1: Save immediately with pending status
+    // Step 1: Save immediately with pending status (unchanged from Phase 1)
     const lead = new Lead({ ...input, status: 'pending' });
     await lead.save();
 
     console.log(`[LeadService] Created lead ${lead.id} for ${input.company}`);
 
-    // Step 2: Analyze with AI
-    try {
-      const analysis = await aiProvider.analyzeLead(input);
+    // Step 2: Enqueue the analysis job instead of calling AI inline
+    // This returns almost instantly - it's just adding data to Redis
+    await enqueueLeadAnalysis({
+      leadId: lead.id,
+      input,
+    });
 
-      // Step 3: Update with successful analysis
-      lead.aiAnalysis = analysis;
-      lead.status = 'analyzed';
+    console.log(`[LeadService] Enqueued analysis job for lead ${lead.id}`);
 
-      console.log(
-        `[LeadService] Lead ${lead.id} analyzed. Score: ${analysis.leadScore.score} (${analysis.leadScore.category})`
-      );
-    } catch (error) {
-      // Step 4: Record the failure — do not rethrow, return the failed lead
-      const reason = error instanceof Error ? error.message : 'Unknown AI error';
-      lead.status = 'failed';
-      lead.failureReason = reason;
-
-      console.error(`[LeadService] AI analysis failed for lead ${lead.id}:`, reason);
-    }
-
-    // Step 5: Save final state
-    await lead.save();
+    // Step 3: Return immediately - the client does NOT wait for AI anymore
     return lead;
   }
 
@@ -81,22 +50,15 @@ export class LeadService {
     limit?: number;
   }): Promise<{ leads: ILead[]; total: number; page: number; totalPages: number }> {
     const page = Math.max(1, filters.page ?? 1);
-    const limit = Math.min(50, Math.max(1, filters.limit ?? 20)); // Cap at 50
+    const limit = Math.min(50, Math.max(1, filters.limit ?? 20));
     const skip = (page - 1) * limit;
 
-    // Build query dynamically based on provided filters
     const query: Record<string, unknown> = {};
     if (filters.status) query.status = filters.status;
     if (filters.category) {
       query['aiAnalysis.leadScore.category'] = filters.category;
     }
 
-    /**
-     * Promise.all runs both queries in parallel
-     * Instead of: count (wait) → then find (wait) = 2x database round trips
-     * We do: count + find simultaneously = 1x round trip time
-     * Always parallelize independent database operations
-     */
     const [leads, total] = await Promise.all([
       Lead.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
       Lead.countDocuments(query),
@@ -129,7 +91,7 @@ export class LeadService {
         humanReviewedAt: new Date(),
         ...reviewData,
       },
-      { new: true } // Return the updated document, not the original
+      { new: true }
     );
   }
 }

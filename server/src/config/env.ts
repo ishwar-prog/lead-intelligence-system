@@ -22,6 +22,11 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   GEMINI_API_KEY: z.string().min(1, 'GEMINI_API_KEY is required'),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
+
+    // New: Redis connection for job queue
+  REDIS_HOST: z.string().min(1, 'REDIS_HOST is required'),
+  REDIS_PORT: z.string().min(1, 'REDIS_PORT is required'),
+  REDIS_PASSWORD: z.string().min(1, 'REDIS_PASSWORD is required'),
 });
 
 const parsed = envSchema.safeParse(process.env);
