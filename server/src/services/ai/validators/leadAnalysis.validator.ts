@@ -31,11 +31,11 @@ export const leadAnalysisOutputSchema = z.object({
     .min(5, 'Pain point too short'),
 
   outreach: z.object({
-    firstEmail: z.object({
-      subject: z.string().min(5, 'Email subject too short'),
-      body: z.string().max(1500, 'Email body exceeds limit'),
-      wordCount: z.number().positive('Word count must be positive'),
-    }),
+   firstEmail: z.object({
+  subject: z.string().min(5, 'Email subject too short'),
+  body: z.string().min(20, 'Email body is missing or too short').max(1500, 'Email body exceeds limit'),
+  wordCount: z.number().positive('Word count must be positive'),
+}),
     linkedinMessage: z
       .string()
       .max(600, 'LinkedIn message too long'),
