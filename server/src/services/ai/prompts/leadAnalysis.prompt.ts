@@ -69,9 +69,11 @@ CONFIDENCE LEVEL RULES:
 OUTPUT INSTRUCTIONS:
 - First email body must be under 120 words. Be specific to their pain point.
 - LinkedIn message must be under 50 words.
-- CRM note should be 2-3 sentences for a sales rep to read.
-- responsibleAICaution must state what a human reviewer must verify before acting.
-- missingInformation must list specific data points that would improve scoring accuracy.
+- CRM note should be 1-2 short sentences only, not a paragraph.
+- reasoning must be 1-2 short sentences only. State which criteria were met, briefly. Do not restate the full input back.
+- responsibleAICaution must be 1 sentence only.
+- missingInformation must be a short list of 1-4 word phrases, not full sentences. Example: "decision timeline", "exact budget range".
+- Be concise everywhere. Brevity is required, not optional.
 
 CRITICAL: Return ONLY a valid JSON object matching the structure below.
 No explanation. No preamble. No markdown code blocks. Raw JSON only.
