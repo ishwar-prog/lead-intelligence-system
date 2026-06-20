@@ -28,6 +28,7 @@ export function useLeads(filters: { status?: string; category?: string } = {}) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const inFlightRef = useRef(false); // Prevent overlapping fetches
 
   // useRef, not useState, for the interval ID — we don't want changing
   // this value to trigger a re-render. It's bookkeeping, not UI state.
@@ -39,6 +40,9 @@ export function useLeads(filters: { status?: string; category?: string } = {}) {
   const filtersKey = JSON.stringify(filters);
 
   const fetchLeads = useCallback(async () => {
+    if (inFlightRef.current) return;
+    inFlightRef.current = true;
+
     try {
       const result = await getLeads(filters);
       setLeads(result.leads);
@@ -47,6 +51,7 @@ export function useLeads(filters: { status?: string; category?: string } = {}) {
       setError(err instanceof Error ? err.message : 'Failed to load leads');
     } finally {
       setLoading(false);
+      inFlightRef.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersKey]);

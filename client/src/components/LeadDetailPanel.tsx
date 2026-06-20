@@ -31,6 +31,15 @@ export function LeadDetailPanel({ lead, onClose, onReviewed }: LeadDetailPanelPr
       setReviewError('Reviewer name is required');
       return;
     }
+    const parsedOverride =
+      overrideScore.trim() === '' ? undefined : Number(overrideScore);
+    if (
+      parsedOverride !== undefined &&
+      (!Number.isFinite(parsedOverride) || parsedOverride < 0 || parsedOverride > 100)
+    ) {
+      setReviewError('Override score must be a number between 0 and 100');
+      return;
+    }
 
     setSubmitting(true);
     setReviewError(null);
@@ -38,7 +47,7 @@ export function LeadDetailPanel({ lead, onClose, onReviewed }: LeadDetailPanelPr
     try {
       await submitHumanReview(lead.id, {
         humanReviewedBy: reviewerName,
-        humanOverrideScore: overrideScore ? Number(overrideScore) : undefined,
+        humanOverrideScore: parsedOverride,
         humanNotes: notes || undefined,
       });
       onReviewed();
