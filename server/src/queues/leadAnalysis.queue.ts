@@ -42,14 +42,35 @@ export const leadAnalysisQueue = new Queue<LeadAnalysisJobData>(
   'lead-analysis',
   {
     redis: redisConnection,
+
+    /**
+     * Rate limiter — caps how many jobs this queue processes per
+     * time window, regardless of concurrency settings.
+     *
+     * Professor Note: this is a DIFFERENT concern from `attempts`/`backoff`
+     * below. Those control what happens when a job fails. This controls
+     * how FAST jobs are allowed to start in the first place — throttling
+     * at the source, not reacting after the fact.
+     *
+     * Gemini 2.5 Flash free tier = 10 requests/minute. We set 8, not 10,
+     * deliberately leaving headroom — GeminiProvider's own internal retries
+     * also count against this quota, and Google's enforcement isn't always
+     * razor-precise at the exact boundary. Never engineer right up against
+     * a hard external limit; leave margin.
+     */
+    limiter: {
+      max: 8,
+      duration: 60000, // 8 jobs per 60 seconds
+    },
+
     defaultJobOptions: {
       attempts: 2,
       backoff: {
         type: 'exponential',
-        delay: 3000, // 3s, then 6s before giving up
+        delay: 3000,
       },
-      removeOnComplete: 100, // Keep last 100 completed jobs for debugging, then clean up
-      removeOnFail: 500,     // Keep more failed jobs — you want to investigate failures
+      removeOnComplete: 100,
+      removeOnFail: 500,
     },
   }
 );

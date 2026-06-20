@@ -64,12 +64,12 @@ async function processLeadAnalysisJob(
  * Register the processor with a concurrency limit
  *
  * Professor Note on concurrency:
- * '5' here means this worker will process up to 5 jobs simultaneously.
+ * '3' here means this worker will process up to 3 jobs simultaneously.
  * Why limit it at all? Because Gemini's API has rate limits. If you set
  * this to 100, you'd fire 100 simultaneous requests and get rate-limited
  * immediately. Start conservative, increase based on your actual API quota.
  */
-leadAnalysisQueue.process(5, processLeadAnalysisJob);
+leadAnalysisQueue.process(3, processLeadAnalysisJob);
 
 /**
  * Queue-level event listeners

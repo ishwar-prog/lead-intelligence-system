@@ -67,13 +67,13 @@ CONFIDENCE LEVEL RULES:
 - low: 0-1 scoring factors are clearly present
 
 OUTPUT INSTRUCTIONS:
-- First email body must be under 120 words. Be specific to their pain point.
-- LinkedIn message must be under 50 words.
-- CRM note should be 1-2 short sentences only, not a paragraph.
-- reasoning must be 1-2 short sentences only. State which criteria were met, briefly. Do not restate the full input back.
-- responsibleAICaution must be 1 sentence only.
-- missingInformation must be a short list of 1-4 word phrases, not full sentences. Example: "decision timeline", "exact budget range".
-- Be concise everywhere. Brevity is required, not optional.
+- First email body: maximum 100 words.
+- LinkedIn message: maximum 40 words.
+- reasoning: maximum 25 words. State only which criteria were met.
+- crmNote: maximum 25 words.
+- responsibleAICaution: maximum 20 words.
+- missingInformation: maximum 3 items, each 1-4 words only.
+- Every field has a hard word ceiling above. Do not exceed it under any circumstance.
 
 CRITICAL: Return ONLY a valid JSON object matching the structure below.
 No explanation. No preamble. No markdown code blocks. Raw JSON only.
@@ -89,10 +89,10 @@ No explanation. No preamble. No markdown code blocks. Raw JSON only.
   "outreach": {
     "firstEmail": {
       "subject": <string — specific, not generic>,
-      "body": <string — under 120 words, personalized>,
+      "body": <string — under 100 words, personalized>,
       "wordCount": <number>
     },
-    "linkedinMessage": <string — under 50 words>,
+    "linkedinMessage": <string — under 40 words>,
     "followUpAction": <string — specific action for sales rep>,
     "followUpDays": <number — days until follow up>
   },
