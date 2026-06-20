@@ -47,7 +47,7 @@ const aiRateLimiter = rateLimit({
 });
 
 // 5. Routes
-app.use('/api/leads', aiRateLimiter, leadRoutes);
+app.use('/api/leads', leadRoutes);
 
 // 6. Health check — every production service needs this
 // Load balancers and monitoring tools ping this endpoint

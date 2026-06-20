@@ -73,7 +73,7 @@ export class GeminiProvider implements AIProvider {
                * Remember this rule forever.
                */
               temperature: 0.2,
-              maxOutputTokens: 2048, // Hard cap — prevents runaway expensive responses
+              maxOutputTokens: 3072, // Hard cap — prevents runaway expensive responses
               topP: 0.8,
             },
           },
