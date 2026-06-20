@@ -1,5 +1,6 @@
 import type { Lead } from '../types/lead.types';
 import { StatusBadge } from './StatusBadge';
+import { Gauge } from './Gauge';
 
 interface LeadCardProps {
   lead: Lead;
@@ -8,26 +9,22 @@ interface LeadCardProps {
 
 export function LeadCard({ lead, onSelect }: LeadCardProps) {
   return (
-    <button className="lead-card" onClick={() => onSelect(lead)}>
-      <div className="lead-card-header">
-        <strong>{lead.company}</strong>
-        <StatusBadge
-          status={lead.status}
-          category={lead.aiAnalysis?.leadScore.category}
-        />
-      </div>
-      <div className="lead-card-meta">
-        <span>{lead.role}</span>
-        <span>{lead.industry}</span>
-        {lead.aiAnalysis && (
-          <span className="lead-card-score">
-            Score: {lead.aiAnalysis.leadScore.score}
-          </span>
-        )}
-      </div>
-      {lead.humanReviewed && (
-        <span className="lead-card-reviewed">✓ Human Reviewed</span>
+    <button onClick={() => onSelect(lead)} className="instrument-card screw relative flex w-full items-center gap-4 p-4 text-left">
+      {lead.aiAnalysis ? (
+        <Gauge score={lead.aiAnalysis.leadScore.score} size={64} />
+      ) : (
+        <div className="h-10 w-16" />
       )}
+      <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <strong className="text-[15px]">{lead.company}</strong>
+          <StatusBadge status={lead.status} category={lead.aiAnalysis?.leadScore.category} />
+        </div>
+        <div className="mt-1 flex gap-3 text-xs text-[#7a7164]">
+          <span>{lead.role}</span>
+          <span>{lead.industry}</span>
+        </div>
+      </div>
     </button>
   );
 }

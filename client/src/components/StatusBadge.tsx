@@ -5,29 +5,22 @@ interface StatusBadgeProps {
   category?: LeadCategory;
 }
 
-/**
- * StatusBadge — pure presentational component
- *
- * Professor Note: this component receives data and renders it.
- * It has no state, no API calls, no side effects. This is called
- * a "presentational" or "dumb" component - and that's a compliment,
- * not an insult. Components that do one visual job, predictably,
- * are easy to test and easy to reuse.
- */
+const CATEGORY_COLOR: Record<LeadCategory, string> = {
+  hot: 'var(--color-brass-dark)',
+  warm: '#9C7A2E',
+  cold: 'var(--color-steel)',
+};
+
 export function StatusBadge({ status, category }: StatusBadgeProps) {
   if (status === 'pending') {
-    return <span className="badge badge-pending">Analyzing…</span>;
+    return <span className="font-mono text-[11px] tracking-wide" style={{ color: 'var(--color-steel)' }}>◌ ANALYZING</span>;
   }
-
   if (status === 'failed') {
-    return <span className="badge badge-failed">Analysis Failed</span>;
+    return <span className="font-mono text-[11px] tracking-wide text-[#9C3B3B]">⊘ FAILED</span>;
   }
-
-  // status === 'analyzed' - show category instead
-  const categoryClass = category ? `badge-${category}` : '';
   return (
-    <span className={`badge ${categoryClass}`}>
-      {category?.toUpperCase() ?? 'ANALYZED'}
+    <span className="font-mono text-[11px] tracking-wide" style={{ color: category ? CATEGORY_COLOR[category] : 'var(--color-ink)' }}>
+      ● {category?.toUpperCase() ?? 'DONE'}
     </span>
   );
 }
