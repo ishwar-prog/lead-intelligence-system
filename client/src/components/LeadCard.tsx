@@ -9,7 +9,7 @@ interface LeadCardProps {
 }
 
 export function LeadCard({ lead, onSelect, onDelete }: LeadCardProps) {
-  const created = new Date(lead.createdAt).toLocaleString('en-IN', {
+  const created = new Date(lead.createdAt).toLocaleString(undefined, {
     day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
   });
   return (

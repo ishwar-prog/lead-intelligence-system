@@ -56,14 +56,19 @@ export class LeadController {
     try {
       const validated = createLeadSchema.parse(req.body);
       const lead = await leadService.createAndAnalyzeLead(req.userId!, validated);
-      res.status(202).json({ success: true, data: lead, message: '...' });
+      res.status(202).json({ success: true, data: lead, message: 'Lead created and queued for analysis' });
     } catch (error) { next(error); }
   }
 
   async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { status, category, page, limit } = req.query;
-      const result = await leadService.getAllLeads(req.userId!, { /* ...filters... */ });
+       const result = await leadService.getAllLeads(req.userId!, {
+       status: status as string | undefined,
+        category: category as string | undefined,
+        page: page ? Number(page) : undefined,
+        limit: limit ? Number(limit) : undefined,
+      });
       res.json({ success: true, ...result });
     } catch (error) { next(error); }
   }

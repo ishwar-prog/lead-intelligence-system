@@ -13,7 +13,8 @@ export class AuthService {
     }
 
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-    const user = await User.create({ email, passwordHash, name });
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.create({ email: normalizedEmail, passwordHash, name });
     return { user, token: this.generateToken(user.id) };
   }
 

@@ -49,7 +49,11 @@ export class AuthController {
   }
 
   async logout(_req: AuthenticatedRequest, res: Response): Promise<void> {
-    res.clearCookie(env.COOKIE_NAME);
+    res.clearCookie(env.COOKIE_NAME , {
+        httpOnly: true,
+        secure: env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
+    });
     res.json({ success: true, message: 'Logged out' });
   }
 

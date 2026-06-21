@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import * as authApi from '../api/auth.api';
 import type { AuthUser } from '../api/auth.api';
 
@@ -10,32 +10,44 @@ interface AuthContextValue {
   logout: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const authVersionRef = useRef(0);
 
   useEffect(() => {
-    authApi.getCurrentUser().then((u) => {
-      setUser(u);
-      setLoading(false);
-    });
+    const version = authVersionRef.current;
+    authApi
+      .getCurrentUser()
+      .then((u) => {
+        if (authVersionRef.current === version) setUser(u);
+      })
+      .finally(() => {
+        if (authVersionRef.current === version) setLoading(false);
+      });
   }, []);
 
   async function login(email: string, password: string) {
+    const version = ++authVersionRef.current;
     const u = await authApi.login(email, password);
-    setUser(u);
+    if (authVersionRef.current === version) setUser(u);
+    setLoading(false);
   }
 
   async function register(email: string, password: string, name: string) {
+    const version = ++authVersionRef.current;
     const u = await authApi.register(email, password, name);
-    setUser(u);
+    if (authVersionRef.current === version) setUser(u);
+    setLoading(false);
   }
 
   async function logout() {
+    const version = ++authVersionRef.current;
     await authApi.logout();
-    setUser(null);
+    if (authVersionRef.current === version) setUser(null);
+    setLoading(false);
   }
 
   return (
@@ -47,6 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (ctx === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
   return ctx;
 }

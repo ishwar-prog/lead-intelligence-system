@@ -13,20 +13,31 @@ export function DashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const liveSelectedLead = selectedLead
     ? leads.find((l) => l.id === selectedLead.id) ?? selectedLead
     : null;
 
   async function handleDelete(id: string) {
-    await deleteLead(id);
-    if (selectedLead?.id === id) setSelectedLead(null); // close detail panel if you deleted what's open
-    refetch();
+    try {
+      setActionError(null);
+      await deleteLead(id);
+      if(selectedLead?.id === id) setSelectedLead(null);
+      await refetch();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to delete lead');
+    }
   }
 
   async function handleLogout() {
-    await logout();
-    navigate('/login');
+    try {
+      setActionError(null);
+      await logout();
+      navigate('/login');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to log out');
+    }
   }
 
   return (
