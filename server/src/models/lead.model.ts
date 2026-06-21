@@ -16,6 +16,7 @@ import { LeadAnalysisOutput } from '../types/ai.types';
  * This is responsible AI design — every AI output needs a human review path.
  */
 export interface ILead extends Document {
+  userId : mongoose.Types.ObjectId; // Reference to the user who created the lead
   // Input fields — what the sales rep submitted
   company: string;
   industry: string;
@@ -25,6 +26,8 @@ export interface ILead extends Document {
   budgetSignal: string;
   timeline: string;
   leadSource: string;
+
+  deletedAt : Date | null;
 
   // AI output — stored as rich subdocument, not a string
   aiAnalysis: LeadAnalysisOutput | null;
@@ -47,6 +50,7 @@ export interface ILead extends Document {
 
 const LeadSchema = new Schema<ILead>(
   {
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     company: { type: String, required: true, trim: true, maxlength: 200 },
     industry: { type: String, required: true, trim: true },
     role: { type: String, required: true, trim: true },
@@ -59,6 +63,8 @@ const LeadSchema = new Schema<ILead>(
     budgetSignal: { type: String, default: 'Unknown' },
     timeline: { type: String, default: 'Unknown' },
     leadSource: { type: String, required: true },
+
+    deletedAt: { type: Date, default: null }, // Soft delete timestamp
 
     // Schema.Types.Mixed allows storing any object structure
     // We use this because the AI output shape is complex and nested
@@ -109,6 +115,8 @@ const LeadSchema = new Schema<ILead>(
  * Rule: Add an index for every field you filter or sort by in queries.
  * Rule: Do not add indexes for fields you never query — they slow down writes.
  */
+LeadSchema.index({ userId: 1 , status: 1 }); // Compound index for userId + status
+LeadSchema.index({ userId: 1, deletedAt: 1 }); // Compound index for userId + deletedAt
 LeadSchema.index({ status: 1 });
 LeadSchema.index({ 'aiAnalysis.leadScore.category': 1 });
 LeadSchema.index({ humanReviewed: 1 });
