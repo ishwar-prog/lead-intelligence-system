@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLeads } from '../hooks/useLeads';
+import { useAuth } from '../hooks/useAuth';
+import { deleteLead } from '../api/leads.api';
 import { LeadForm } from '../components/LeadForm';
 import { LeadCard } from '../components/LeadCard';
 import { LeadDetailPanel } from '../components/LeadDetailPanel';
@@ -7,43 +10,64 @@ import type { Lead } from '../types/lead.types';
 
 export function DashboardPage() {
   const { leads, loading, error, refetch } = useLeads();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  // When the detail panel is open and the underlying lead updates
-  // (e.g. status flips from pending -> analyzed via polling, or a
-  // review gets submitted), keep the open panel in sync rather than
-  // showing stale data until the user closes and reopens it.
   const liveSelectedLead = selectedLead
     ? leads.find((l) => l.id === selectedLead.id) ?? selectedLead
     : null;
 
+  async function handleDelete(id: string) {
+    try {
+      setActionError(null);
+      await deleteLead(id);
+      if(selectedLead?.id === id) setSelectedLead(null);
+      await refetch();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to delete lead');
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      setActionError(null);
+      await logout();
+      navigate('/login');
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Failed to log out');
+    }
+  }
+
   return (
     <div className="dashboard">
-      <header>
+      <header className="flex items-center justify-between">
         <h1>Lead Intelligence Dashboard</h1>
+        <div className="flex items-center gap-3 font-mono text-sm">
+          <span className="text-[#7a7164]">{user?.email}</span>
+          <button onClick={handleLogout} className="rounded-full border px-4 py-1.5" style={{ borderColor: 'var(--color-groove)' }}>
+            Log out
+          </button>
+        </div>
       </header>
 
       <LeadForm onLeadCreated={refetch} />
 
       <section className="lead-list-section">
         <h2>Leads ({leads.length})</h2>
-
         {loading && <p>Loading…</p>}
         {error && <p className="form-error">{error}</p>}
 
         <div className="lead-list">
           {leads.map((lead) => (
-            <LeadCard key={lead.id} lead={lead} onSelect={setSelectedLead} />
+            <LeadCard key={lead.id} lead={lead} onSelect={setSelectedLead} onDelete={handleDelete} />
           ))}
         </div>
       </section>
 
       {liveSelectedLead && (
-        <LeadDetailPanel
-          lead={liveSelectedLead}
-          onClose={() => setSelectedLead(null)}
-          onReviewed={refetch}
-        />
+        <LeadDetailPanel lead={liveSelectedLead} onClose={() => setSelectedLead(null)} onReviewed={refetch} />
       )}
     </div>
   );

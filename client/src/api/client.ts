@@ -20,11 +20,9 @@ if (!apiBaseUrl) {
 }
 
 const apiClient = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  withCredentials: true, // sends and receives the httpOnly session cookie
 });
 
 export default apiClient;

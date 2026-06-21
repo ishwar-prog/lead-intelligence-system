@@ -1,24 +1,25 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './hooks/useAuth';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { LandingPage } from './pages/LandingPage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
-import './App.css'; // existing dashboard styles - unchanged for now
-import './index.css'; // Tailwind + font
+import './App.css';
+import './index.css';
 
-/**
- * Professor Note: your DashboardPage component, hooks, and API layer
- * are completely untouched by this change. We're only adding a router
- * ABOVE the existing tree. Phase 3's logic - polling, form handling,
- * human review - all still works exactly as before, just reachable
- * at /dashboard instead of being the only thing on screen.
- */
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

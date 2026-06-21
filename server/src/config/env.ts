@@ -27,6 +27,10 @@ const envSchema = z.object({
   REDIS_HOST: z.string().min(1, 'REDIS_HOST is required'),
   REDIS_PORT: z.string().min(1, 'REDIS_PORT is required'),
   REDIS_PASSWORD: z.string().min(1, 'REDIS_PASSWORD is required'),
+
+  JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  COOKIE_NAME: z.string().default('lead_intel_session'),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -6,8 +6,12 @@ import mongoose from 'mongoose';
 import { env } from './config/env';
 import leadRoutes from './routes/lead.routes';
 import { errorHandler } from './middleware/errorHandler';
+import cookieParser from 'cookie-parser';
+import authRoutes from './routes/auth.routes';
+import { requireAuth } from './middleware/requireAuth';
 
 const app = express();
+app.use(cookieParser());
 
 /**
  * Middleware Order Matters
@@ -47,7 +51,9 @@ const aiRateLimiter = rateLimit({
 });
 
 // 5. Routes
-app.use('/api/leads', aiRateLimiter, leadRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/leads', requireAuth, aiRateLimiter, leadRoutes);
+
 
 // 6. Health check — every production service needs this
 // Load balancers and monitoring tools ping this endpoint

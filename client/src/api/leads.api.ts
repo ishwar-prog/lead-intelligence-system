@@ -62,3 +62,7 @@ export async function submitHumanReview(
   }
   return response.data.data;
 }
+
+export async function deleteLead(id: string): Promise<void> {
+  await apiClient.delete(`/leads/${id}`);
+}
