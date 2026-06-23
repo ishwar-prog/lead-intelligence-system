@@ -65,3 +65,22 @@ export interface LeadAnalysisOutput {
 export interface AIProvider {
   analyzeLead(input: LeadAnalysisInput): Promise<LeadAnalysisOutput>;
 }
+
+export type CompanySize = '1-10' | '11-50' | '51-200' | '201-1000' | '1000+';
+
+export interface LeadExtractionOutput {
+  company: string | null;
+  industry: string | null;
+  role: string | null;
+  companySize: CompanySize | null;
+  painPoint: string | null;
+  budgetSignal: string | null;
+  timeline: string | null;
+  leadSource: string | null;
+  extractionConfidence: 'high' | 'medium' | 'low';
+  fieldsNotFound: string[];
+}
+
+export interface LeadExtractor {
+  extractLeadFields(rawText: string): Promise<LeadExtractionOutput>;
+}

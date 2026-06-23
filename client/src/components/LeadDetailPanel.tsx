@@ -75,11 +75,13 @@ export function LeadDetailPanel({ lead, onClose, onReviewed }: LeadDetailPanelPr
           <p className="detail-pending">AI analysis in progress…</p>
         )}
 
-        {lead.status === 'failed' && (
-          <p className="detail-failed">
-            Analysis failed: {lead.failureReason}
-          </p>
-        )}
+       {lead.status === 'failed' && (
+  <p className="detail-failed">
+    {lead.failureReason?.startsWith('GEMINI_UNAVAILABLE')
+      ? "⚠ The AI service is temporarily overloaded on Google's end. This is not an issue with your data - try resubmitting in a few minutes."
+      : `Analysis failed: ${lead.failureReason}`}
+  </p>
+)}
 
         {lead.aiAnalysis && (
           <>

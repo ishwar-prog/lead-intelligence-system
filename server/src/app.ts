@@ -39,7 +39,7 @@ app.use(express.json({ limit: '10kb' }));
 
 // 4. Rate limiting for AI endpoints
 // Each AI call costs money and takes time — protect the endpoint
-const aiRateLimiter = rateLimit({
+export const aiRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minute window
   max: 30,                    // Max 30 AI requests per IP per window
   standardHeaders: true,
@@ -52,7 +52,7 @@ const aiRateLimiter = rateLimit({
 
 // 5. Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/leads', requireAuth, aiRateLimiter, leadRoutes);
+app.use('/api/leads', requireAuth, leadRoutes);
 
 
 // 6. Health check — every production service needs this

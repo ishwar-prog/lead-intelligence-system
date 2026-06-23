@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { LeadService } from '../services/lead/lead.service';
 import { AuthenticatedRequest } from '../middleware/requireAuth';
+import {LeadExtractionService} from "../services/lead/leadExtraction.service";
 
 /**
  * Input validation schema for creating a lead
@@ -37,6 +38,15 @@ const humanReviewSchema = z.object({
 });
 
 const leadService = new LeadService();
+const leadExtractionService = new LeadExtractionService();
+
+const extractionInputSchema = z.object({
+  rawText: z
+    .string()
+    .trim()
+    .min(20, 'Please paste more detail - at least 20 characters')
+    .max(4000, 'Pasted text is too long - please trim it to the relevant section'),
+});
 
 /**
  * LeadController — HTTP layer only
@@ -59,6 +69,16 @@ export class LeadController {
       res.status(202).json({ success: true, data: lead, message: 'Lead created and queued for analysis' });
     } catch (error) { next(error); }
   }
+
+  async extract(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { rawText } = extractionInputSchema.parse(req.body);
+    const extracted = await leadExtractionService.extract(rawText);
+    res.json({ success: true, data: extracted });
+  } catch (error) {
+    next(error);
+  }
+}
 
   async getAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {

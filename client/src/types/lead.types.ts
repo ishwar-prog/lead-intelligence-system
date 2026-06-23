@@ -20,6 +20,19 @@ export type LeadStatus = 'pending' | 'analyzed' | 'failed';
 export type LeadCategory = 'hot' | 'warm' | 'cold';
 export type CompanySize = '1-10' | '11-50' | '51-200' | '201-1000' | '1000+';
 
+export interface LeadExtractionResult {
+  company: string | null;
+  industry: string | null;
+  role: string | null;
+  companySize: CompanySize | null;
+  painPoint: string | null;
+  budgetSignal: string | null;
+  timeline: string | null;
+  leadSource: string | null;
+  extractionConfidence: 'high' | 'medium' | 'low';
+  fieldsNotFound: string[];
+}
+
 export interface LeadScore {
   score: number;
   category: LeadCategory;
@@ -107,3 +120,4 @@ export interface PaginatedLeadsResponse {
   page: number;
   totalPages: number;
 }
+
