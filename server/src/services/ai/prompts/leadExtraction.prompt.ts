@@ -1,15 +1,14 @@
 export const EXTRACTION_PROMPT_VERSION = 'v1.0.0';
 
 export function buildExtractionPrompt(rawText: string): string {
+  const escapedRawText = JSON.stringify(rawText);
   return `
 You are a data-entry assistant. Extract structured lead information from
 the unstructured text below. It might be a copied email, a LinkedIn bio,
 notes from a call, or anything else a salesperson pasted in.
 
 RAW TEXT:
-"""
-${rawText}
-"""
+${escapedRawText}
 
 Extract these fields. If a field is not clearly present, return null for
 it. Never guess or invent a plausible-sounding value - null is the correct

@@ -43,6 +43,7 @@ const leadExtractionService = new LeadExtractionService();
 const extractionInputSchema = z.object({
   rawText: z
     .string()
+    .trim()
     .min(20, 'Please paste more detail - at least 20 characters')
     .max(4000, 'Pasted text is too long - please trim it to the relevant section'),
 });

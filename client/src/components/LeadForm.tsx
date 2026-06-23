@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import type { useState, FormEvent } from 'react';
 import { createLead, extractLeadFromText } from '../api/leads.api.ts';
 import type { CompanySize, CreateLeadInput } from '../types/lead.types';
 
@@ -42,7 +42,7 @@ export function LeadForm({ onLeadCreated }: LeadFormProps) {
         company: result.company ?? '',
         industry: result.industry ?? '',
         role: result.role ?? '',
-        companySize: result.companySize ?? '1-10',
+        companySize: (result.companySize ?? '') as CompanySize,
         painPoint: result.painPoint ?? '',
         budgetSignal: result.budgetSignal ?? '',
         timeline: result.timeline ?? '',
@@ -108,6 +108,7 @@ export function LeadForm({ onLeadCreated }: LeadFormProps) {
             placeholder="Paste an email, LinkedIn bio, call notes - anything with lead details in it"
             value={pasteText}
             onChange={(e) => setPasteText(e.target.value)}
+            maxLength={4000}
             className="w-full rounded-md border px-3 py-2"
             style={{ borderColor: 'var(--color-groove)' }}
           />

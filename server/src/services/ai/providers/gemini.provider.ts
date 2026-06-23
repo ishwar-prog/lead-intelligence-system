@@ -106,8 +106,8 @@ export class GeminiProvider implements AIProvider, LeadExtractor {
         try {
           parsed = JSON.parse(cleanedText);
         } catch {
-          throw new Error(
-            `Gemini returned invalid JSON. Preview: ${cleanedText.substring(0, 300)}`,
+         throw new Error(
+            "Gemini returned invalid JSON.",
           );
         }
 
@@ -137,14 +137,18 @@ export class GeminiProvider implements AIProvider, LeadExtractor {
         }
 
         if (error instanceof AxiosError && error.response?.status === 429) {
-          console.warn("[Gemini] Rate limited. Waiting before retry...");
-          await sleep(BASE_RETRY_DELAY_MS * attempt * 2);
+          if (attempt < MAX_RETRIES) {
+            console.warn("[Gemini] Rate limited. Waiting before retry...");
+            await sleep(BASE_RETRY_DELAY_MS * attempt * 2);
+          }
         } else if (error instanceof AxiosError && error.response?.status === 503) {
-          // 503 = Google's infrastructure is temporarily overloaded, not our fault
-          // and not our rate limit. This tends to clear within a few seconds, so
-          // it's worth waiting longer than a generic failure before retrying.
-          console.warn("[Gemini] Service temporarily unavailable (503). Waiting before retry...");
-          await sleep(BASE_RETRY_DELAY_MS * attempt * 3);
+           if (attempt < MAX_RETRIES) {
+           // 503 = Google's infrastructure is temporarily overloaded, not our fault
+            // and not our rate limit. This tends to clear within a few seconds, so
+            // it's worth waiting longer than a generic failure before retrying.
+            console.warn("[Gemini] Service temporarily unavailable (503). Waiting before retry...");
+            await sleep(BASE_RETRY_DELAY_MS * attempt * 3);
+          }
         } else if (attempt < MAX_RETRIES) {
           const delay = BASE_RETRY_DELAY_MS * attempt;
           console.warn(`[Gemini] Attempt ${attempt} failed. Retrying in ${delay}ms...`);
