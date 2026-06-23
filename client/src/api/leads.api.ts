@@ -6,6 +6,7 @@ import type{
   ApiResponse,
   PaginatedLeadsResponse,
 } from '../types/lead.types';
+import type { LeadExtractionResult } from '../types/ai.types';
 
 /**
  * leads.api.ts — The ONLY file that knows your backend's URL structure
@@ -65,4 +66,12 @@ export async function submitHumanReview(
 
 export async function deleteLead(id: string): Promise<void> {
   await apiClient.delete(`/leads/${id}`);
+}
+
+export async function extractLeadFromText(rawText: string): Promise<LeadExtractionResult> {
+  const response = await apiClient.post<ApiResponse<LeadExtractionResult>>('/leads/extract', { rawText });
+  if (!response.data.data) {
+    throw new Error(response.data.message || 'Failed to extract lead');
+  }
+  return response.data.data;
 }
