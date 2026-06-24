@@ -36,6 +36,9 @@ export function LandingPage() {
         <Link to="/dashboard" className="instrument-card rounded-full px-5 py-2 text-sm font-medium">
           Open Console
         </Link>
+        <Link to="/trust" className="font-mono text-xs uppercase tracking-wide" style={{ color: 'var(--color-steel)' }}>
+          How it's built to be trusted
+        </Link>
       </nav>
 
       <section className="relative z-10 mx-auto max-w-4xl px-8 pt-16 pb-24 text-center">
