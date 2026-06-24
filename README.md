@@ -46,7 +46,7 @@ actively watching.
 | Auth | JWT in httpOnly cookies | Inaccessible to client-side JS, mitigating XSS token theft |
 | Frontend | React + TypeScript + Vite | — |
 | Styling | Tailwind v4 | Custom skeuomorphic design system (see below) |
-| Animation | GSAP (`useGSAP`) | Handles React 18 Strict Mode + cleanup correctly out of the box |
+| Animation | GSAP (`useGSAP`) | Handles React 19 + cleanup correctly out of the box |
 | CI | GitHub Actions | Type-check + build on every push, server and client independently |
 
 ## Design System
