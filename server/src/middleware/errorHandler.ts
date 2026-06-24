@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
+import { AppError } from '../errors/AppError';
 
 /**
  * Centralized Error Handler
@@ -41,6 +42,15 @@ export function errorHandler(
   // Default — internal server error
   // In production: never expose error details to client
   // In development: show message for easier debugging
+  if (error instanceof AppError) {
+    res.status(error.statusCode).json({
+      success: false,
+      message: error.message,
+      code: error.code,
+    });
+    return;
+  }
+
   res.status(500).json({
     success: false,
     message:

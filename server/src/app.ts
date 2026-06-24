@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import mongoose from 'mongoose';
 import { env } from './config/env';
 import leadRoutes from './routes/lead.routes';
@@ -37,25 +36,12 @@ app.use(
 // 3. Body parser — limit size to prevent large payload attacks
 app.use(express.json({ limit: '10kb' }));
 
-// 4. Rate limiting for AI endpoints
-// Each AI call costs money and takes time — protect the endpoint
-export const aiRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minute window
-  max: 30,                    // Max 30 AI requests per IP per window
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    success: false,
-    message: 'Too many requests. Please wait before submitting more leads.',
-  },
-});
-
-// 5. Routes
+// 4. Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', requireAuth, leadRoutes);
 
 
-// 6. Health check — every production service needs this
+// 5. Health check — every production service needs this
 // Load balancers and monitoring tools ping this endpoint
 app.get('/health', (_, res) => {
   res.json({
@@ -65,12 +51,12 @@ app.get('/health', (_, res) => {
   });
 });
 
-// 7. 404 handler — catches routes that don't exist
+// 6. 404 handler — catches routes that don't exist
 app.use((_, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
 });
 
-// 8. Error handler — MUST be last
+// 7. Error handler — MUST be last
 app.use(errorHandler);
 
 // Database connection — separated from server startup

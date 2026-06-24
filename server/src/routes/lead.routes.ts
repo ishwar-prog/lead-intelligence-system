@@ -1,18 +1,9 @@
 import { Router } from 'express';
 import { LeadController } from '../controllers/lead.controller';
-import rateLimit from 'express-rate-limit';
-import { aiRateLimiter } from '../app';
+import { aiRateLimiter, extractionLimiter } from '../middleware/rateLimiters';
 
 const router = Router();
 const controller = new LeadController();
-
-const extractionLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minute
-    max: 5, 
-    standardHeaders : true,
-    legacyHeaders: false,
-    message: { success: false, message: 'Too many extraction requests from this IP, please try again after a minute' },
-});
 
 /**
  * Lead Routes

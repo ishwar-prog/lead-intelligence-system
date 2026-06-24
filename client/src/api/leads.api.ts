@@ -1,12 +1,23 @@
 import apiClient from './client';
+import axios from 'axios';
 import type{
   Lead,
   CreateLeadInput,
   HumanReviewInput,
   ApiResponse,
   PaginatedLeadsResponse,
+  LeadExtractionResult,
 } from '../types/lead.types';
-import type { LeadExtractionResult } from '../types/ai.types';
+
+function getApiErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error) && error.response) {
+    const data = error.response.data as { message?: unknown } | undefined;
+    const message = typeof data?.message === 'string' ? data.message : error.message;
+    return `${message} (status ${error.response.status})`;
+  }
+
+  return error instanceof Error ? error.message : 'Request failed';
+}
 
 /**
  * leads.api.ts — The ONLY file that knows your backend's URL structure
@@ -69,9 +80,13 @@ export async function deleteLead(id: string): Promise<void> {
 }
 
 export async function extractLeadFromText(rawText: string): Promise<LeadExtractionResult> {
-  const response = await apiClient.post<ApiResponse<LeadExtractionResult>>('/leads/extract', { rawText });
-  if (!response.data.data) {
-    throw new Error(response.data.message || 'Failed to extract lead');
+  try {
+    const response = await apiClient.post<ApiResponse<LeadExtractionResult>>('/leads/extract', { rawText });
+    if (!response.data.data) {
+      throw new Error(response.data.message || 'Failed to extract lead');
+    }
+    return response.data.data;
+  } catch (error) {
+    throw new Error(getApiErrorMessage(error));
   }
-  return response.data.data;
 }

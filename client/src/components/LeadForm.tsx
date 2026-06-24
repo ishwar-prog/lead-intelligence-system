@@ -1,4 +1,4 @@
-import type { useState, FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { createLead, extractLeadFromText } from '../api/leads.api.ts';
 import type { CompanySize, CreateLeadInput } from '../types/lead.types';
 

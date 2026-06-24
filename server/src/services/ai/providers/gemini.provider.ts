@@ -11,12 +11,57 @@ import { buildExtractionPrompt } from "../prompts/leadExtraction.prompt";
 import { validateLeadAnalysisOutput } from "../validators/leadAnalysis.validator";
 import { validateLeadExtractionOutput } from "../validators/leadExtraction.validator";
 import { env } from "../../../config/env";
+import { AppError } from "../../../errors/AppError";
 
 const MAX_RETRIES = 2;
 const BASE_RETRY_DELAY_MS = 1000;
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normalizeGeminiError(error: unknown): Error {
+  if (error instanceof AppError) {
+    return error;
+  }
+
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status;
+
+    if (status === 503) {
+      return new AppError(
+        503,
+        "Gemini is temporarily unavailable. This is an upstream AI provider issue, not an internal server failure. Please try again shortly.",
+        "AI_PROVIDER_UNAVAILABLE",
+      );
+    }
+
+    if (status === 429) {
+      return new AppError(
+        429,
+        "Gemini is rate limiting requests right now. Please wait a moment and try again.",
+        "AI_PROVIDER_RATE_LIMITED",
+      );
+    }
+
+    if (status === 401 || status === 403) {
+      return new AppError(
+        502,
+        "The AI provider rejected the server credentials. Please check the Gemini API configuration.",
+        "AI_PROVIDER_AUTH_FAILED",
+      );
+    }
+
+    if (status && status >= 500) {
+      return new AppError(
+        502,
+        "The AI provider returned an upstream server error. Please try again shortly.",
+        "AI_PROVIDER_ERROR",
+      );
+    }
+  }
+
+  return error instanceof Error ? error : new Error(String(error));
 }
 
 /**
@@ -120,7 +165,7 @@ export class GeminiProvider implements AIProvider, LeadExtractor {
           tokensUsed: response.data?.usageMetadata?.totalTokenCount,
         };
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
+        lastError = normalizeGeminiError(error);
 
         if (
           lastError.message.includes("invalid response structure") ||
@@ -130,10 +175,11 @@ export class GeminiProvider implements AIProvider, LeadExtractor {
           throw lastError;
         }
 
-        if (error instanceof AxiosError && error.response?.status === 401) {
-          throw new Error(
-            "Gemini API authentication failed. Check your GEMINI_API_KEY.",
-          );
+        if (
+          lastError instanceof AppError &&
+          lastError.code === "AI_PROVIDER_AUTH_FAILED"
+        ) {
+          throw lastError;
         }
 
         if (error instanceof AxiosError && error.response?.status === 429) {

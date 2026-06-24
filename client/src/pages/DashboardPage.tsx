@@ -53,6 +53,7 @@ export function DashboardPage() {
       </header>
 
       <LeadForm onLeadCreated={refetch} />
+      {actionError && <p className="form-error">{actionError}</p>}
 
       <section className="lead-list-section">
         <h2>Leads ({leads.length})</h2>
