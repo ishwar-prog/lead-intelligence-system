@@ -26,7 +26,7 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ background: 'var(--color-paper)' }}>
+    <div className="flex min-h-screen items-center justify-center">
       <div className="grain-texture" />
       <form onSubmit={handleSubmit} className="instrument-card screw relative z-10 w-full max-w-sm p-8">
         <h1 className="text-xl font-semibold">Create an account</h1>

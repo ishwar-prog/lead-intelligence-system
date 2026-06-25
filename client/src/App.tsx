@@ -6,12 +6,14 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TrustPage } from './pages/TrustPage';
+import { ShaderBackground } from './components/ShaderBackground';
 import './App.css';
 import './index.css';
 
 function App() {
   return (
     <AuthProvider>
+      <ShaderBackground />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<LandingPage />} />

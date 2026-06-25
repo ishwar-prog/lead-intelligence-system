@@ -17,7 +17,7 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-paper);
+  background-color: transparent;
   color: var(--color-ink);
 }
 

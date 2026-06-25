@@ -30,7 +30,7 @@ const SECTIONS = [
 
 export function TrustPage() {
   return (
-    <div className="min-h-screen" style={{ background: 'var(--color-paper)' }}>
+    <div className="min-h-screen">
       <div className="grain-texture" />
       <nav className="relative z-10 mx-auto flex max-w-4xl items-center justify-between px-8 py-7">
         <Link to="/" className="font-mono text-sm uppercase tracking-[0.15em]" style={{ color: 'var(--color-brass-dark)' }}>

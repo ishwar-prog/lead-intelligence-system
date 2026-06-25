@@ -26,7 +26,7 @@ export function LandingPage() {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-screen" style={{ background: 'var(--color-paper)' }}>
+    <div ref={containerRef} className="relative min-h-screen">
       <div className="grain-texture" />
 
       <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-8 py-7">
