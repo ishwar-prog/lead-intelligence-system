@@ -1,5 +1,6 @@
 import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { LiquidButton } from '../components/ui/liquid-glass-button';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -9,6 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useGSAP(
     () => {
@@ -33,9 +35,9 @@ export function LandingPage() {
         <span className="font-mono text-sm uppercase tracking-[0.15em]" style={{ color: 'var(--color-brass-dark)' }}>
           LEAD-INTEL // 01
         </span>
-        <Link to="/dashboard" className="instrument-card rounded-full px-5 py-2 text-sm font-medium">
+        <LiquidButton onClick={() => navigate('/dashboard')} className="rounded-full px-5 py-2 text-sm font-medium">
           Open Console
-        </Link>
+        </LiquidButton>
         <Link to="/trust" className="font-mono text-xs uppercase tracking-wide" style={{ color: 'var(--color-steel)' }}>
           How it's built to be trusted
         </Link>
@@ -57,13 +59,12 @@ export function LandingPage() {
           A calibrated AI instrument that scores, drafts, and routes inbound
           leads — reviewed by a human before anything ships.
         </p>
-        <Link
-          to="/dashboard"
+        <LiquidButton
+          onClick={() => navigate('/dashboard')}
           className="hero-sub mt-9 inline-flex items-center gap-2 rounded-full px-7 py-3 font-medium text-white"
-          style={{ background: 'var(--color-ink)' }}
         >
-          Calibrate a lead →
-        </Link>
+          Calibrate a lead ✨
+        </LiquidButton>
       </section>
 
       <section className="relative z-10 mx-auto grid max-w-5xl gap-5 px-8 pb-28 md:grid-cols-3">

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { LiquidButton } from '../components/ui/liquid-glass-button';
 
 export function RegisterPage() {
   const { register } = useAuth();
@@ -71,14 +72,13 @@ export function RegisterPage() {
 
         {error && <p className="mt-3 text-sm text-[#9C3B3B]">{error}</p>}
 
-        <button
+        <LiquidButton
           type="submit"
           disabled={submitting}
           className="mt-6 w-full rounded-full py-2.5 font-medium text-white"
-          style={{ background: 'var(--color-ink)' }}
         >
           {submitting ? 'Creating account…' : 'Create account'}
-        </button>
+        </LiquidButton>
 
         <p className="mt-4 text-center text-sm text-[#7a7164]">
           Already have an account? <Link to="/login" className="font-medium underline">Sign in</Link>

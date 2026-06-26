@@ -1,6 +1,7 @@
 import type { Lead } from '../types/lead.types';
 import { StatusBadge } from './StatusBadge';
 import { Gauge } from './Gauge';
+import { LiquidButton } from './ui/liquid-glass-button';
 
 interface LeadCardProps {
   lead: Lead;
@@ -28,12 +29,12 @@ export function LeadCard({ lead, onSelect, onDelete }: LeadCardProps) {
           </div>
         </div>
       </button>
-      <button
+      <LiquidButton
         onClick={(e) => { e.stopPropagation(); if (confirm(`Remove ${lead.company}?`)) onDelete(lead.id); }}
-        className="font-mono text-xs text-[#9C3B3B] hover:underline"
+        className="font-mono text-xs text-[#9C3B3B] bg-transparent hover:bg-[#9C3B3B]/10 px-3 py-1 shadow-none border-none"
       >
         Remove
-      </button>
+      </LiquidButton>
     </div>
   );
 }

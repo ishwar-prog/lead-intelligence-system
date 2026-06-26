@@ -59,22 +59,6 @@ textarea {
   font-family: inherit;
 }
 
-button {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-button:disabled {
-  background: #a5b4d8;
-  cursor: not-allowed;
-}
-
 .form-error {
   color: #d92d20;
   font-size: 0.85rem;

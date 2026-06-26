@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { createLead, extractLeadFromText } from '../api/leads.api.ts';
 import type { CompanySize, CreateLeadInput } from '../types/lead.types';
+import { LiquidButton } from './ui/liquid-glass-button';
 
 interface LeadFormProps {
   onLeadCreated: () => void;
@@ -16,6 +17,49 @@ const EMPTY_FORM: CreateLeadInput = {
   timeline: '',
   leadSource: '',
 };
+
+const glassField =
+  'w-full rounded-xl border border-white/40 bg-white/[0.06] px-3 py-2 text-[#1c1c1e] placeholder:text-[#1c1c1e]/40 ' +
+  'backdrop-blur-sm outline-none transition-all duration-200 ' +
+  'focus:border-white/80 focus:bg-white/[0.14] focus:shadow-[0_0_0_3px_rgba(255,255,255,0.25)]';
+
+// The SVG displacement filter that gives true liquid-glass refraction.
+// Rendered once, referenced via backdropFilter: url(#container-glass).
+function GlassFilter() {
+  return (
+    <svg className="hidden">
+      <defs>
+        <filter
+          id="container-glass"
+          x="0%"
+          y="0%"
+          width="100%"
+          height="100%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.02 0.02"
+            numOctaves={1}
+            seed={1}
+            result="turbulence"
+          />
+          <feGaussianBlur in="turbulence" stdDeviation={2} result="blurredNoise" />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="blurredNoise"
+            scale={120}
+            xChannelSelector="R"
+            yChannelSelector="B"
+            result="displaced"
+          />
+          <feGaussianBlur in="displaced" stdDeviation={4} result="finalBlur" />
+          <feComposite in="finalBlur" in2="finalBlur" operator="over" />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
 
 export function LeadForm({ onLeadCreated }: LeadFormProps) {
   const [mode, setMode] = useState<'manual' | 'paste'>('manual');
@@ -36,8 +80,6 @@ export function LeadForm({ onLeadCreated }: LeadFormProps) {
     setExtractionNote(null);
     try {
       const result = await extractLeadFromText(pasteText);
-      // Pre-fill the SAME fields the manual form uses. Nothing is created
-      // yet - the person reviews and edits before this becomes a real lead.
       setForm({
         company: result.company ?? '',
         industry: result.industry ?? '',
@@ -53,7 +95,7 @@ export function LeadForm({ onLeadCreated }: LeadFormProps) {
           `Couldn't confidently find: ${result.fieldsNotFound.join(', ')}. Please review and fill these in.`
         );
       }
-      setMode('manual'); // drop into the editable form for review
+      setMode('manual');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Extraction failed');
     } finally {
@@ -79,125 +121,144 @@ export function LeadForm({ onLeadCreated }: LeadFormProps) {
   }
 
   return (
-    <div className="lead-form">
-      <div className="flex items-center justify-between">
-        <h2>New Lead</h2>
-        <div className="flex gap-2 font-mono text-xs">
-          <button
-            type="button"
-            onClick={() => setMode('manual')}
-            className={mode === 'manual' ? 'font-semibold underline' : 'text-[#7a7164]'}
-          >
-            Fill manually
-          </button>
-          <span className="text-[#7a7164]">/</span>
-          <button
-            type="button"
-            onClick={() => setMode('paste')}
-            className={mode === 'paste' ? 'font-semibold underline' : 'text-[#7a7164]'}
-          >
-            Paste &amp; extract
-          </button>
-        </div>
-      </div>
-
-      {mode === 'paste' && (
-        <div className="mt-4">
-          <textarea
-            rows={5}
-            placeholder="Paste an email, LinkedIn bio, call notes - anything with lead details in it"
-            value={pasteText}
-            onChange={(e) => setPasteText(e.target.value)}
-            maxLength={4000}
-            className="w-full rounded-md border px-3 py-2"
-            style={{ borderColor: 'var(--color-groove)' }}
-          />
-          <button
-            type="button"
-            onClick={handleExtract}
-            disabled={extracting || pasteText.trim().length < 20}
-            className="mt-2 rounded-full px-5 py-2 text-sm font-medium text-white"
-            style={{ background: 'var(--color-ink)' }}
-          >
-            {extracting ? 'Extracting…' : 'Extract fields →'}
-          </button>
-          {error && <p className="form-error mt-2">{error}</p>}
-        </div>
-      )}
-
-      {mode === 'manual' && (
-        <form onSubmit={handleSubmit}>
-          {extractionNote && (
-            <p
-              className="mt-3 rounded-md p-2 font-mono text-xs"
-              style={{ background: '#FFF8EC', color: 'var(--color-brass-dark)' }}
+    <div>
+      <div
+        data-slot="card"
+        style={{ backdropFilter: 'url("#container-glass")' }}
+        className="text-card-foreground bg-white/[0.05] flex flex-col gap-6 rounded-2xl border border-white/30 p-6
+          shadow-[0_0_6px_rgba(0,0,0,0.03),0_2px_6px_rgba(0,0,0,0.08),inset_3px_3px_0.5px_-3px_rgba(255,255,255,0.9),inset_-3px_-3px_0.5px_-3px_rgba(255,255,255,0.85),inset_1px_1px_1px_-0.5px_rgba(255,255,255,0.6),inset_-1px_-1px_1px_-0.5px_rgba(255,255,255,0.6),inset_0_0_6px_6px_rgba(255,255,255,0.12),inset_0_0_2px_2px_rgba(255,255,255,0.06),0_0_12px_rgba(255,255,255,0.15)]
+          transition-all"
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold tracking-tight text-[#1c1c1e]">New Lead</h2>
+          <div className="flex gap-2 font-mono text-xs">
+            <LiquidButton
+              type="button"
+              onClick={() => setMode('manual')}
+              className={mode === 'manual' ? 'font-semibold underline px-3 py-1 text-xs' : 'text-[#1c1c1e]/50 px-3 py-1 text-xs'}
             >
-              {extractionNote}
-            </p>
-          )}
-
-          <div className="form-row">
-            <label>
-              Company
-              <input required value={form.company} onChange={(e) => updateField('company', e.target.value)} />
-            </label>
-            <label>
-              Industry
-              <input required value={form.industry} onChange={(e) => updateField('industry', e.target.value)} />
-            </label>
+              Fill manually
+            </LiquidButton>
+            <span className="text-[#1c1c1e]/40">/</span>
+            <LiquidButton
+              type="button"
+              onClick={() => setMode('paste')}
+              className={mode === 'paste' ? 'font-semibold underline px-3 py-1 text-xs' : 'text-[#1c1c1e]/50 px-3 py-1 text-xs'}
+            >
+              Paste &amp; extract
+            </LiquidButton>
           </div>
+        </div>
 
-          <div className="form-row">
-            <label>
-              Role
-              <input required value={form.role} onChange={(e) => updateField('role', e.target.value)} />
-            </label>
-            <label>
-              Company Size
-              <select value={form.companySize} onChange={(e) => updateField('companySize', e.target.value as CompanySize)}>
-                <option value="1-10">1-10</option>
-                <option value="11-50">11-50</option>
-                <option value="51-200">51-200</option>
-                <option value="201-1000">201-1000</option>
-                <option value="1000+">1000+</option>
-              </select>
-            </label>
-          </div>
-
-          <label>
-            Pain Point
+        {mode === 'paste' && (
+          <div>
             <textarea
-              required
-              minLength={10}
-              rows={3}
-              value={form.painPoint}
-              onChange={(e) => updateField('painPoint', e.target.value)}
+              rows={5}
+              placeholder="Paste an email, LinkedIn bio, call notes - anything with lead details in it"
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              maxLength={4000}
+              className={glassField}
             />
-          </label>
-
-          <div className="form-row">
-            <label>
-              Budget Signal
-              <input value={form.budgetSignal} onChange={(e) => updateField('budgetSignal', e.target.value)} placeholder="Unknown" />
-            </label>
-            <label>
-              Timeline
-              <input value={form.timeline} onChange={(e) => updateField('timeline', e.target.value)} placeholder="Unknown" />
-            </label>
+            <LiquidButton
+              type="button"
+              onClick={handleExtract}
+              disabled={extracting || pasteText.trim().length < 20}
+              className="mt-2 w-full rounded-full py-2.5 font-medium text-white"
+            >
+              {extracting ? 'Extracting…' : 'Extract fields ✨'}
+            </LiquidButton>
+            {error && <p className="text-[#b3261e] mt-2">{error}</p>}
           </div>
+        )}
 
-          <label>
-            Lead Source
-            <input required value={form.leadSource} onChange={(e) => updateField('leadSource', e.target.value)} />
-          </label>
+        {mode === 'manual' && (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {extractionNote && (
+              <p className="rounded-xl border border-white/40 bg-white/[0.1] p-2 font-mono text-xs text-[#1c1c1e]/80 backdrop-blur-sm">
+                {extractionNote}
+              </p>
+            )}
 
-          {error && <p className="form-error">{error}</p>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+                Company
+                <input required value={form.company} onChange={(e) => updateField('company', e.target.value)} className={glassField} />
+              </label>
+              <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+                Industry
+                <input required value={form.industry} onChange={(e) => updateField('industry', e.target.value)} className={glassField} />
+              </label>
+            </div>
 
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Submitting…' : 'Submit Lead'}
-          </button>
-        </form>
-      )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+                Role
+                <input required value={form.role} onChange={(e) => updateField('role', e.target.value)} className={glassField} />
+              </label>
+              <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+                Company Size
+                <select
+                  value={form.companySize}
+                  onChange={(e) => updateField('companySize', e.target.value as CompanySize)}
+                  className={`${glassField} appearance-none`}
+                >
+                  <option className="text-black" value="1-10">1-10</option>
+                  <option className="text-black" value="11-50">11-50</option>
+                  <option className="text-black" value="51-200">51-200</option>
+                  <option className="text-black" value="201-1000">201-1000</option>
+                  <option className="text-black" value="1000+">1000+</option>
+                </select>
+              </label>
+            </div>
+
+            <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+              Pain Point
+              <textarea
+                required
+                minLength={10}
+                rows={3}
+                value={form.painPoint}
+                onChange={(e) => updateField('painPoint', e.target.value)}
+                className={glassField}
+              />
+            </label>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+                Budget Signal
+                <input
+                  value={form.budgetSignal}
+                  onChange={(e) => updateField('budgetSignal', e.target.value)}
+                  placeholder="Unknown"
+                  className={glassField}
+                />
+              </label>
+              <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+                Timeline
+                <input
+                  value={form.timeline}
+                  onChange={(e) => updateField('timeline', e.target.value)}
+                  placeholder="Unknown"
+                  className={glassField}
+                />
+              </label>
+            </div>
+
+            <label className="flex flex-col gap-1 text-sm text-[#1c1c1e]/80">
+              Lead Source
+              <input required value={form.leadSource} onChange={(e) => updateField('leadSource', e.target.value)} className={glassField} />
+            </label>
+
+            {error && <p className="text-[#b3261e]">{error}</p>}
+
+            <LiquidButton type="submit" disabled={submitting} className="mt-2 w-full">
+              {submitting ? 'Submitting…' : 'Submit Lead'}
+            </LiquidButton>
+          </form>
+        )}
+      </div>
+      <GlassFilter />
     </div>
   );
 }
