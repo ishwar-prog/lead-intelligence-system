@@ -20,7 +20,7 @@ const createLeadSchema = z.object({
   industry: z.string().min(1, 'Industry is required').max(100),
   role: z.string().min(1, 'Role is required').max(100),
   companySize: z.enum(['1-10', '11-50', '51-200', '201-1000', '1000+'], {
-    errorMap: () => ({ message: 'Invalid company size' }),
+    message: 'Invalid company size',
   }),
   painPoint: z
     .string()
@@ -95,7 +95,7 @@ export class LeadController {
 
   async getById(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const lead = await leadService.getLeadById(req.userId!, req.params.id);
+      const lead = await leadService.getLeadById(req.userId!, req.params.id as string);
       if (!lead) { res.status(404).json({ success: false, message: 'Lead not found' }); return; }
       res.json({ success: true, data: lead });
     } catch (error) { next(error); }
@@ -104,7 +104,7 @@ export class LeadController {
   async humanReview(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const validated = humanReviewSchema.parse(req.body);
-      const lead = await leadService.humanReviewLead(req.userId!, req.params.id, validated);
+      const lead = await leadService.humanReviewLead(req.userId!, req.params.id as string, validated);
       if (!lead) { res.status(404).json({ success: false, message: 'Lead not found' }); return; }
       res.json({ success: true, data: lead });
     } catch (error) { next(error); }
@@ -112,9 +112,51 @@ export class LeadController {
 
   async delete(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const lead = await leadService.softDeleteLead(req.userId!, req.params.id);
+      const lead = await leadService.softDeleteLead(req.userId!, req.params.id as string);
       if (!lead) { res.status(404).json({ success: false, message: 'Lead not found' }); return; }
       res.json({ success: true, message: 'Lead removed' });
+    } catch (error) { next(error); }
+  }
+
+  async getAllDeleted(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+       const page = typeof req.query.page === 'string' ? Number(req.query.page) : undefined;
+      const limit = typeof req.query.limit === 'string' ? Number(req.query.limit) : undefined;
+      const result = await leadService.getAllDeletedLeads(req.userId!, {
+        page: Number.isFinite(page) && page > 0 ? page : undefined,
+        limit: Number.isFinite(limit) && limit > 0 ? limit : undefined,
+      });
+      res.json({ success: true, ...result });
+    } catch (error) { next(error); }
+  }
+
+  async restore(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const lead = await leadService.restoreLead(req.userId!, req.params.id as string);
+      if (!lead) { res.status(404).json({ success: false, message: 'Lead not found or not deleted' }); return; }
+      res.json({ success: true, data: lead, message: 'Lead restored' });
+    } catch (error) { next(error); }
+  }
+
+  async permanentlyDelete(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const lead = await leadService.permanentlyDeleteLead(req.userId!, req.params.id as string);
+      if (!lead) { res.status(404).json({ success: false, message: 'Lead not found or not deleted' }); return; }
+      res.json({ success: true, message: 'Lead permanently deleted' });
+    } catch (error) { next(error); }
+  }
+
+  async restoreAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await leadService.restoreAllLeads(req.userId!);
+      res.json({ success: true, message: 'All removed leads restored' });
+    } catch (error) { next(error); }
+  }
+
+  async permanentlyDeleteAll(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      await leadService.permanentlyDeleteAllLeads(req.userId!);
+      res.json({ success: true, message: 'All removed leads permanently deleted' });
     } catch (error) { next(error); }
   }
 }

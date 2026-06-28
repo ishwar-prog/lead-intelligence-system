@@ -1,23 +1,24 @@
-@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'General Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Outfit', 'Inter', sans-serif;
   --font-mono: 'IBM Plex Mono', 'SF Mono', monospace;
 
-  --color-paper: #F3EFE6;
-  --color-paper-raised: #FAF7F0;
-  --color-ink: #211D1A;
-  --color-brass: #A8632A;
-  --color-brass-dark: #7A4719;
-  --color-steel: #3E5C76;
-  --color-groove: #D9D2C2;
+  --color-paper: #1e293b;
+  --color-paper-raised: rgba(30, 41, 59, 0.7);
+  --color-ink: #f8fafc;
+  --color-brass: #fbbf24;
+  --color-brass-dark: #fcd34d;
+  --color-steel: #cbd5e1;
+  --color-groove: rgba(255, 255, 255, 0.15);
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-paper);
+  background-color: #f9fafb;
   color: var(--color-ink);
 }
 
@@ -43,26 +44,26 @@ body {
   80% { transform: translate(2%, -2%); }
 }
 
-/* Instrument card - layered shadows simulate an embossed panel resting on paper */
+/* Instrument card - glassmorphism with bright text */
 .instrument-card {
-  background: var(--color-paper-raised);
-  border: 1px solid var(--color-groove);
-  border-radius: 14px;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.6) inset,
-    0 -1px 0 rgba(0,0,0,0.04) inset,
-    0 8px 16px -8px rgba(33,29,26,0.18),
-    0 2px 4px rgba(33,29,26,0.06);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 
+    0 4px 30px rgba(0, 0, 0, 0.05),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .instrument-card:hover {
   transform: translateY(-3px);
-  box-shadow:
-    0 1px 0 rgba(255,255,255,0.6) inset,
-    0 -1px 0 rgba(0,0,0,0.04) inset,
-    0 16px 28px -10px rgba(33,29,26,0.22),
-    0 4px 8px rgba(33,29,26,0.08);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 /* Brass corner screws - a rack-mounted-equipment detail */
@@ -79,3 +80,24 @@ body {
 }
 .screw::before { top: 10px; left: 10px; }
 .screw::after { top: 10px; right: 10px; }
+
+/* Seamless Marquee Scroller keyframes and classes */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.mask-gradient {
+  mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+}

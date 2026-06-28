@@ -90,3 +90,33 @@ export async function extractLeadFromText(rawText: string): Promise<LeadExtracti
     throw new Error(getApiErrorMessage(error));
   }
 }
+
+export async function getDeletedLeads(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<PaginatedLeadsResponse> {
+  const response = await apiClient.get<PaginatedLeadsResponse>('/leads/deleted', {
+    params,
+  });
+  return response.data;
+}
+
+export async function restoreLead(id: string): Promise<Lead> {
+  const response = await apiClient.post<ApiResponse<Lead>>(`/leads/${id}/restore`);
+  if (!response.data.data) {
+    throw new Error(response.data.message || 'Failed to restore lead');
+  }
+  return response.data.data;
+}
+
+export async function permanentlyDeleteLead(id: string): Promise<void> {
+  await apiClient.delete(`/leads/${id}/permanent`);
+}
+
+export async function restoreAllLeads(): Promise<void> {
+  await apiClient.post('/leads/restore-all');
+}
+
+export async function permanentlyDeleteAllLeads(): Promise<void> {
+  await apiClient.delete('/leads/clean-all');
+}

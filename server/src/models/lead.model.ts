@@ -94,7 +94,7 @@ const LeadSchema = new Schema<ILead>(
        * We rename _id to id and remove __v (MongoDB internal version field)
        * This gives the client a cleaner API response without MongoDB internals
        */
-      transform(_, ret) {
+      transform(_, ret: any) {
         ret.id = ret._id;
         delete ret._id;
         delete ret.__v;

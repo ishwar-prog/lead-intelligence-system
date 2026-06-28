@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Lead } from '../types/lead.types';
 import { submitHumanReview } from '../api/leads.api';
 import { StatusBadge } from './StatusBadge';
+import { LiquidButton } from './ui/liquid-glass-button';
 
 interface LeadDetailPanelProps {
   lead: Lead;
@@ -63,7 +64,7 @@ export function LeadDetailPanel({ lead, onClose, onReviewed }: LeadDetailPanelPr
   return (
     <div className="detail-overlay" onClick={onClose}>
       <div className="detail-panel" onClick={(e) => e.stopPropagation()}>
-        <button className="detail-close" onClick={onClose}>✕</button>
+        <LiquidButton className="detail-close absolute right-4 top-4 bg-transparent border-none shadow-none text-gray-500 hover:text-black hover:bg-gray-100" onClick={onClose}>✕</LiquidButton>
 
         <h2>{lead.company}</h2>
         <StatusBadge
@@ -172,9 +173,9 @@ export function LeadDetailPanel({ lead, onClose, onReviewed }: LeadDetailPanelPr
                 />
               </label>
               {reviewError && <p className="form-error">{reviewError}</p>}
-              <button onClick={handleReviewSubmit} disabled={submitting}>
+              <LiquidButton onClick={handleReviewSubmit} disabled={submitting}>
                 {submitting ? 'Submitting…' : 'Confirm Review'}
-              </button>
+              </LiquidButton>
             </div>
           )}
         </section>
