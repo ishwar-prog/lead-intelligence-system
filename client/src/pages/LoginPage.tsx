@@ -3,6 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { LiquidButton } from '../components/ui/liquid-glass-button';
 
+const glassField =
+  'mt-1.5 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-white placeholder:text-white/30 ' +
+  'backdrop-blur-md outline-none transition-all duration-300 font-sans ' +
+  'hover:border-white/20 hover:bg-white/10 focus:border-white/35 focus:bg-white/[0.08] focus:scale-[1.01]';
+
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -28,25 +33,49 @@ export function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="grain-texture" />
-      <form onSubmit={handleSubmit} className="instrument-card screw relative z-10 w-full max-w-sm p-8">
-        <h1 className="text-xl font-semibold">Sign in</h1>
-        <label className="mt-5 block text-sm font-medium">
+      <form
+        onSubmit={handleSubmit}
+        className="relative z-10 w-full max-w-sm rounded-[32px] border border-white/10 bg-white/5 p-8 backdrop-blur-md shadow-2xl transition-all duration-300 hover:border-white/15"
+      >
+        <h1 className="text-xl font-semibold text-white font-display">Sign in</h1>
+
+        <label className="mt-5 block text-sm font-medium text-white/80 font-sans">
           Email
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                 className="mt-1 w-full rounded-md border px-3 py-2" style={{ borderColor: 'var(--color-groove)' }} />
+          <input 
+            type="email" 
+            required 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            className={glassField} 
+          />
         </label>
-        <label className="mt-3 block text-sm font-medium">
+
+        <label className="mt-3 block text-sm font-medium text-white/80 font-sans">
           Password
-          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-                 className="mt-1 w-full rounded-md border px-3 py-2" style={{ borderColor: 'var(--color-groove)' }} />
+          <input
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={glassField}
+          />
         </label>
-        {error && <p className="mt-3 text-sm text-[#9C3B3B]">{error}</p>}
-        <LiquidButton type="submit" disabled={submitting}
-                className="mt-6 w-full rounded-full py-2.5 font-medium text-white">
+
+        {error && <p className="mt-3 text-sm text-[#f87171] font-sans">{error}</p>}
+
+        <LiquidButton 
+          type="submit" 
+          disabled={submitting} 
+          className="mt-6 w-full rounded-full py-2.5 font-medium hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer font-sans"
+        >
           {submitting ? 'Signing in…' : 'Sign in'}
         </LiquidButton>
-        <p className="mt-4 text-center text-sm text-[#7a7164]">
-          No account? <Link to="/register" className="font-medium underline">Register</Link>
+
+        <p className="mt-4 text-center text-sm text-white/60 font-sans">
+          No account?{' '}
+          <Link to="/register" className="font-medium underline hover:text-white transition-colors">
+            Register
+          </Link>
         </p>
       </form>
     </div>

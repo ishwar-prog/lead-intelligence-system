@@ -43,10 +43,13 @@ export function DashboardPage() {
   return (
     <div className="dashboard">
       <header className="flex items-center justify-between">
-        <h1>Lead Intelligence Dashboard</h1>
+        <h1 className="text-white">Lead Intelligence Dashboard</h1>
         <div className="flex items-center gap-3 font-mono text-sm">
-          <span className="text-[#7a7164]">{user?.email}</span>
-          <button onClick={handleLogout} className="rounded-full border px-4 py-1.5" style={{ borderColor: 'var(--color-groove)' }}>
+          <span className="text-slate-300">{user?.email}</span>
+          <button 
+            onClick={handleLogout} 
+            className="rounded-full border border-white/20 px-4 py-1.5 text-white hover:bg-white/10 transition-colors cursor-pointer"
+          >
             Log out
           </button>
         </div>
@@ -56,8 +59,8 @@ export function DashboardPage() {
       {actionError && <p className="form-error">{actionError}</p>}
 
       <section className="lead-list-section">
-        <h2>Leads ({leads.length})</h2>
-        {loading && <p>Loading…</p>}
+        <h2 className="text-white">Leads ({leads.length})</h2>
+        {loading && <p className="text-slate-300">Loading…</p>}
         {error && <p className="form-error">{error}</p>}
 
         <div className="lead-list">

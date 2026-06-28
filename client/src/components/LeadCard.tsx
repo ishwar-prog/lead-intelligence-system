@@ -22,7 +22,7 @@ export function LeadCard({ lead, onSelect, onDelete }: LeadCardProps) {
             <strong className="text-[15px]">{lead.company}</strong>
             <StatusBadge status={lead.status} category={lead.aiAnalysis?.leadScore.category} />
           </div>
-          <div className="mt-1 flex gap-3 text-xs text-[#7a7164]">
+          <div className="mt-1 flex gap-3 text-xs text-slate-300">
             <span>{lead.role}</span>
             <span>{lead.industry}</span>
             <span className="font-mono">{created}</span>
@@ -31,7 +31,7 @@ export function LeadCard({ lead, onSelect, onDelete }: LeadCardProps) {
       </button>
       <LiquidButton
         onClick={(e) => { e.stopPropagation(); if (confirm(`Remove ${lead.company}?`)) onDelete(lead.id); }}
-        className="font-mono text-xs text-[#9C3B3B] bg-transparent hover:bg-[#9C3B3B]/10 px-3 py-1 shadow-none border-none"
+        className="font-mono text-xs text-rose-400 bg-transparent hover:bg-rose-500/10 px-3 py-1 shadow-none border-none"
       >
         Remove
       </LiquidButton>
