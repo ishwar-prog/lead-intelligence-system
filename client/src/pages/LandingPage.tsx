@@ -99,8 +99,9 @@ export function LandingPage() {
             {/* Open Console action button (replaces Get in touch) */}
             <button
               onClick={() => navigate('/dashboard')}
-              className="group relative px-4 md:px-5 py-2 rounded-full text-[12px] font-semibold text-[#0a1b33] bg-white border border-slate-200/60 shadow-sm hover:bg-slate-50 transition-all flex items-center gap-1 cursor-pointer overflow-hidden"
+              className="group relative px-4 md:px-5 py-2 rounded-full text-[12px] font-semibold text-[#0a1b33] bg-white border border-slate-200/60 shadow-sm hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer overflow-hidden"
             >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#fcd34d] shadow-[0_0_5px_#fcd34d] shrink-0" />
               <span className="relative z-10">Open Console</span>
               <ChevronRight size={14} className="relative z-10 text-[#0a1b33] group-hover:translate-x-0.5 transition-transform" />
             </button>
@@ -125,7 +126,7 @@ export function LandingPage() {
         </div>
 
         {/* Lead scoring Visual Indicator */}
-        <div className="mb-16 flex flex-col items-center bg-white/5 px-8 py-7 rounded-[36px] border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.15)] backdrop-blur-md">
+        <div className="mb-16 flex flex-col items-center bg-white/5 px-8 py-7 rounded-[36px] border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.15)] backdrop-blur-md screw relative">
           <span className="text-[11px] font-bold tracking-wider text-slate-400 font-mono mb-4">CURRENT GAUGE SCORE</span>
           <Gauge score={100} size={140} />
           <span className="text-[12px] font-semibold text-white mt-3 font-display">100% Calibrated Match</span>
@@ -152,7 +153,7 @@ export function LandingPage() {
           ].map((f) => (
             <div
               key={f.title}
-              className="relative bg-white/5 border border-white/10 backdrop-blur-md rounded-[32px] p-8 hover:border-white/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-300 flex flex-col justify-between"
+              className="relative bg-white/5 border border-white/10 backdrop-blur-md rounded-[32px] p-8 hover:border-white/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-300 flex flex-col justify-between screw"
             >
               <div>
                 <span className="font-mono text-[10px] font-bold tracking-widest text-slate-400 block mb-5">{f.label}</span>

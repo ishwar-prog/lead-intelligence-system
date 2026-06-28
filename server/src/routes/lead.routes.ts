@@ -15,8 +15,14 @@ const controller = new LeadController();
 // Standard Operations — Protected by the global AI / general limiter
 router.post('/', aiRateLimiter, controller.create.bind(controller));
 router.get('/', aiRateLimiter, controller.getAll.bind(controller));
+router.get('/deleted', aiRateLimiter, controller.getAllDeleted.bind(controller));
+router.post('/restore-all', aiRateLimiter, controller.restoreAll.bind(controller));
+router.delete('/clean-all', aiRateLimiter, controller.permanentlyDeleteAll.bind(controller));
+
 router.get('/:id', aiRateLimiter, controller.getById.bind(controller));
 router.patch('/:id/review', aiRateLimiter, controller.humanReview.bind(controller));
+router.post('/:id/restore', aiRateLimiter, controller.restore.bind(controller));
+router.delete('/:id/permanent', aiRateLimiter, controller.permanentlyDelete.bind(controller));
 router.delete('/:id', aiRateLimiter, controller.delete.bind(controller));
 
 // AI Extraction Utility (Perfectly isolated with its own extractionLimiter)

@@ -82,6 +82,7 @@ export interface Lead {
   humanNotes?: string;
   createdAt: string;
   updatedAt: string;
+  deletedAt?: string | null;
 }
 
 export interface CreateLeadInput {

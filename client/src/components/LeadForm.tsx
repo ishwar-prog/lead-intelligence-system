@@ -92,7 +92,7 @@ export function LeadForm({ onLeadCreated }: LeadFormProps) {
     <div>
       <div
         data-slot="card"
-        className="text-card-foreground bg-white/5 flex flex-col gap-6 rounded-[32px] border border-white/10 p-6 backdrop-blur-md shadow-2xl transition-all duration-300 hover:border-white/15"
+        className="text-card-foreground bg-white/5 flex flex-col gap-6 rounded-[32px] border border-white/10 p-6 backdrop-blur-md shadow-2xl transition-all duration-300 hover:border-white/15 screw relative"
       >
         <div className="flex items-center justify-between">
           <h2 className="font-semibold tracking-tight text-white font-display">New Lead</h2>

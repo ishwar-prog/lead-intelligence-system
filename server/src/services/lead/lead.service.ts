@@ -76,4 +76,45 @@ export class LeadService {
       { new: true }
     );
   }
+
+  async getAllDeletedLeads(
+    userId: string,
+    filters: { page?: number; limit?: number } = {}
+  ) {
+    const page = Math.max(1, filters.page ?? 1);
+    const limit = Math.min(50, Math.max(1, filters.limit ?? 20));
+    const skip = (page - 1) * limit;
+
+    const query = { userId, deletedAt: { $ne: null } };
+
+    const [leads, total] = await Promise.all([
+      Lead.find(query).sort({ deletedAt: -1 }).skip(skip).limit(limit),
+      Lead.countDocuments(query),
+    ]);
+
+    return { leads, total, page, totalPages: Math.ceil(total / limit) };
+  }
+
+  async restoreLead(userId: string, id: string): Promise<ILead | null> {
+    return Lead.findOneAndUpdate(
+      { _id: id, userId, deletedAt: { $ne: null } },
+      { deletedAt: null },
+      { new: true }
+    );
+  }
+
+  async permanentlyDeleteLead(userId: string, id: string): Promise<ILead | null> {
+    return Lead.findOneAndDelete({ _id: id, userId, deletedAt: { $ne: null } });
+  }
+
+  async restoreAllLeads(userId: string) {
+    return Lead.updateMany(
+      { userId, deletedAt: { $ne: null } },
+      { deletedAt: null }
+    );
+  }
+
+  async permanentlyDeleteAllLeads(userId: string) {
+    return Lead.deleteMany({ userId, deletedAt: { $ne: null } });
+  }
 }
