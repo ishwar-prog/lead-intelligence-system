@@ -120,10 +120,11 @@ export class LeadController {
 
   async getAllDeleted(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { page, limit } = req.query;
+       const page = typeof req.query.page === 'string' ? Number(req.query.page) : undefined;
+      const limit = typeof req.query.limit === 'string' ? Number(req.query.limit) : undefined;
       const result = await leadService.getAllDeletedLeads(req.userId!, {
-        page: page ? Number(page) : undefined,
-        limit: limit ? Number(limit) : undefined,
+        page: Number.isFinite(page) && page > 0 ? page : undefined,
+        limit: Number.isFinite(limit) && limit > 0 ? limit : undefined,
       });
       res.json({ success: true, ...result });
     } catch (error) { next(error); }

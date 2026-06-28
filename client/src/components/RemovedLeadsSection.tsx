@@ -16,7 +16,7 @@ interface RemovedLeadsSectionProps {
   leads: Lead[];
   loading: boolean;
   error: string | null;
-  onActionComplete: () => void;
+  onActionComplete: () => Promise<void>;
 }
 
 export function RemovedLeadsSection({
@@ -38,7 +38,7 @@ export function RemovedLeadsSection({
       setActionError(null);
       setSubmitting(true);
       await restoreLead(id);
-      onActionComplete();
+      await onActionComplete();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to restore lead');
     } finally {
@@ -51,7 +51,7 @@ export function RemovedLeadsSection({
       setActionError(null);
       setSubmitting(true);
       await permanentlyDeleteLead(id);
-      onActionComplete();
+      await onActionComplete();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to permanently delete lead');
     } finally {
@@ -65,7 +65,7 @@ export function RemovedLeadsSection({
       setActionError(null);
       setSubmitting(true);
       await restoreAllLeads();
-      onActionComplete();
+      await onActionComplete();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to restore all leads');
     } finally {
@@ -79,7 +79,7 @@ export function RemovedLeadsSection({
       setActionError(null);
       setSubmitting(true);
       await permanentlyDeleteAllLeads();
-      onActionComplete();
+      await onActionComplete();
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Failed to permanently delete all leads');
     } finally {
