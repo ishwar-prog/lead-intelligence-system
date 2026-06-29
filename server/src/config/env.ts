@@ -44,4 +44,6 @@ if (!parsed.success) {
   process.exit(1); // Crash the app immediately with clear reason
 }
 
+RUN_WORKER_INLINE: z.enum(['true', 'false']).default('false'),
+
 export const env = parsed.data;
