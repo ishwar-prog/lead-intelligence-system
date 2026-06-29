@@ -31,6 +31,8 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32, 'JWT_SECRET must be at least 32 characters'),
   JWT_EXPIRES_IN: z.string().default('7d'),
   COOKIE_NAME: z.string().default('lead_intel_session'),
+
+  RUN_WORKER_INLINE: z.enum(['true', 'false']).default('false'),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -43,7 +45,5 @@ if (!parsed.success) {
   console.error('Check your .env file against .env.example');
   process.exit(1); // Crash the app immediately with clear reason
 }
-
-RUN_WORKER_INLINE: z.enum(['true', 'false']).default('false'),
 
 export const env = parsed.data;
